@@ -41,7 +41,7 @@ def remove_special_chars(text):
     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def run_command(command):
-    process = pexpect.spawn(command, timeout=None, encoding='utf-8')
+    process = pexpect.spawn(command, timeout=None, encoding='utf-8', preexec_fn=preexec)
 
     try:
         while True:
@@ -50,8 +50,7 @@ def run_command(command):
             if index == 0:
                 # Print the current line containing progress information after removing special chars
                 clean_line = remove_special_chars(process.before)
-                print(clean_line, end='', flush=True)
-
+                sys.stdout.write(clean_line)
             elif index == 1:
                 # Handle TIMEOUT (waiting for more output)
                 time.sleep(0.1)
