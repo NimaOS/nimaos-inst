@@ -16,6 +16,9 @@ import sys
 import json
 import signal
 import subprocess
+import pexpect
+import time
+import re
 
 if os.environ.get('TESTING_INST') == 'true':
     testing = True
@@ -28,19 +31,45 @@ mountpoints = []
 ########################################################################################
 # Helper utils
 
-
 def preexec():
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGQUIT, signal.SIG_IGN)
 
+def remove_special_chars(text):
+    # Use regex to filter out special characters and ANSI escape codes
+    return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+
+def run_command(command):
+    process = pexpect.spawn(command)
+
+    try:
+        while True:
+            index = process.expect(['::', pexpect.TIMEOUT, pexpect.EOF], timeout=None)
+
+            if index == 0:
+                # Print the current line containing progress information after removing special chars
+                clean_line = remove_special_chars(process.before.decode('utf-8'))
+                print(clean_line, end='', flush=True)
+
+            elif index == 1:
+                # Handle TIMEOUT (waiting for more output)
+                time.sleep(0.1)
+
+            elif index == 2:
+                # Handle EOF (process has finished)
+                break
+
+    except KeyboardInterrupt:
+        process.terminate()
+    finally:
+        process.wait()
 
 def exec(cmd):
     if testing:
         print(' '.join(cmd))
     else:
-        subprocess.call(cmd, shell=False, stdout=sys.stdout,
-                        stderr=sys.stderr, preexec_fn=preexec)
+        run_command(cmd)
 
 
 def exec_chroot(cmd):
@@ -260,6 +289,8 @@ def inst_setup_base(config):
     exec_chroot(['pacman-key', '--populate', 'archlinux'])
     # Install linux-zen
     # exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux-zen', 'xorriso'])
+    # Install linux
+    exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'xorriso'])
     # Remove jade-gui and nimaos-inst
     exec_chroot(['pacman', '-Rn', '--noconfirm', 'jade-gui', 'nimaos-inst-git'])
 
