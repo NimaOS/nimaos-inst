@@ -41,15 +41,15 @@ def remove_special_chars(text):
     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def run_command(command):
-    process = pexpect.spawn(command)
+    process = pexpect.spawn(command, timeout=None, encoding='utf-8')
 
     try:
         while True:
-            index = process.expect(['::', pexpect.TIMEOUT, pexpect.EOF], timeout=None)
+            index = process.expect(['::', pexpect.TIMEOUT, pexpect.EOF])
 
             if index == 0:
                 # Print the current line containing progress information after removing special chars
-                clean_line = remove_special_chars(process.before.decode('utf-8'))
+                clean_line = remove_special_chars(process.before)
                 print(clean_line, end='', flush=True)
 
             elif index == 1:
@@ -69,7 +69,7 @@ def exec(cmd):
     if testing:
         print(' '.join(cmd))
     else:
-        run_command(cmd)
+        run_command(' '.join(cmd))
 
 
 def exec_chroot(cmd):
@@ -181,9 +181,9 @@ def inst_partition(config):
         else:
             # Create msdos label
             exec(['parted', '-s', device, 'mklabel', 'msdos'])
-            # # Create boot partition
-            # exec(['parted', '-s', device, 'mkpart',
-            #      'primary', 'ext4', '1MIB', '600MIB'])
+            # Create boot partition
+            exec(['parted', '-s', device, 'mkpart',
+                 'primary', 'ext4', '1MIB', '600MIB'])
 
         # Create root partition
         exec(['parted', '-s', device, 'mkpart',
@@ -210,23 +210,17 @@ def inst_partition(config):
             if efi:
                 exec(['mkfs.vfat', '-F32', f'{device}1'])
             else:
-                # exec(['mkfs.ext4', f'{device}1'])
-                pass
-
-            # Format root partition and Mount partitions
-            if efi:
-                exec(['mkfs.ext4', f'{device}2'])
-                mount(f'{device}2', '/mnt')
-            else:
                 exec(['mkfs.ext4', f'{device}1'])
-                mount(f'{device}1', '/mnt')
-
+            # Format root partition
+            exec(['mkfs.ext4', f'{device}2'])
+            # Mount partitions
+            mount(f'{device}2', '/mnt')
             if efi:
                 mkdir('/mnt/boot/efi')
                 mount(f'{device}1', '/mnt/boot/efi')
             else:
                 mkdir('/mnt/boot')
-                # mount(f'{device}1', '/mnt/boot')
+                mount(f'{device}1', '/mnt/boot')
     else:
         partitions.sort(key=lambda x: len(x[1]))
         for p in partitions:
