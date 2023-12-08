@@ -1,12 +1,12 @@
-pkgname='blend-inst-git'
+pkgname='nimaos-inst-git'
 pkgver=r3.76d89ef
 pkgrel=1
-pkgdesc='blendOS Installer Framework'
+pkgdesc='NimaOS Installer Framework'
 arch=(any)
 depends=('squashfs-tools' 'arch-install-scripts' 'util-linux' 'parted')
-provides=('blend-inst')
-conflicts=('blend-inst')
-source=('git-inst::git+https://github.com/blend-os/blend-inst.git')
+provides=('nimaos-inst')
+conflicts=('nimaos-inst')
+source=('git-inst::git+https://github.com/NimaOS/nimaos-inst.git')
 sha256sums=('SKIP')
 
 pkgver() {
