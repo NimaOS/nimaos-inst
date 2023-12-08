@@ -4,7 +4,7 @@
         "mode": "Manual",
         "efi": true,
         "partitions": [
-            "System:/dev/randomdisk1:ext4",
+            "System:/dev/randomdisk1:minix",
             "Boot:/dev/randomdisk2:fat32"
         ]
     },
@@ -20,12 +20,13 @@
         "timezone": "GMT"
     },
     "networking": {
-        "hostname": "blend",
+        "hostname": "NimaOS",
         "ipv6": false
     },
     "users": [
         {
             "name": "user",
+            "fullname": "User",
             "password": "SOME_PLAINTEXT_PASSWORD",
             "shell": "bash"
         }
