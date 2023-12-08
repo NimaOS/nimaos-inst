@@ -152,9 +152,9 @@ def inst_partition(config):
         else:
             # Create msdos label
             exec(['parted', '-s', device, 'mklabel', 'msdos'])
-            # Create boot partition
-            exec(['parted', '-s', device, 'mkpart',
-                 'primary', 'ext4', '1MIB', '600MIB'])
+            # # Create boot partition
+            # exec(['parted', '-s', device, 'mkpart',
+            #      'primary', 'ext4', '1MIB', '600MIB'])
 
         # Create root partition
         exec(['parted', '-s', device, 'mkpart',
@@ -181,17 +181,23 @@ def inst_partition(config):
             if efi:
                 exec(['mkfs.vfat', '-F32', f'{device}1'])
             else:
+                # exec(['mkfs.ext4', f'{device}1'])
+                pass
+
+            # Format root partition and Mount partitions
+            if efi:
+                exec(['mkfs.ext4', f'{device}2'])
+                mount(f'{device}2', '/mnt')
+            else:
                 exec(['mkfs.ext4', f'{device}1'])
-            # Format root partition
-            exec(['mkfs.ext4', f'{device}2'])
-            # Mount partitions
-            mount(f'{device}2', '/mnt')
+                mount(f'{device}1', '/mnt')
+
             if efi:
                 mkdir('/mnt/boot/efi')
                 mount(f'{device}1', '/mnt/boot/efi')
             else:
                 mkdir('/mnt/boot')
-                mount(f'{device}1', '/mnt/boot')
+                # mount(f'{device}1', '/mnt/boot')
     else:
         partitions.sort(key=lambda x: len(x[1]))
         for p in partitions:
@@ -351,7 +357,7 @@ def inst_users(config):
         #     sys.exit(3)
 
         exec_chroot(['useradd', '-m', '-s', '/bin/bash', user['name']])
-        exec_chroot(['usermod', '-c', user['fullname'], user['name']])
+        # exec_chroot(['usermod', '-c', user['fullname'], user['name']]) # TODO: fix fullname
         exec_chroot(
             ['bash', '-c', f'echo \'{user["name"]}:{user["password"]}\' | chpasswd'])
         exec_chroot(['usermod', '-aG', 'wheel', user['name']])
