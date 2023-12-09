@@ -36,39 +36,16 @@ def preexec():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGQUIT, signal.SIG_IGN)
 
-def remove_special_chars(text):
-    # Use regex to filter out special characters and ANSI escape codes
-    return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
-
-def run_command(command):
-    process = pexpect.spawn(command, timeout=None, encoding='utf-8', preexec_fn=preexec)
-
-    try:
-        while True:
-            index = process.expect(['::', pexpect.TIMEOUT, pexpect.EOF])
-
-            if index == 0:
-                # Print the current line containing progress information after removing special chars
-                clean_line = remove_special_chars(process.before)
-                sys.stdout.write(clean_line)
-            elif index == 1:
-                # Handle TIMEOUT (waiting for more output)
-                time.sleep(0.1)
-
-            elif index == 2:
-                # Handle EOF (process has finished)
-                break
-
-    except KeyboardInterrupt:
-        process.terminate()
-    finally:
-        process.wait()
+# def remove_special_chars(text):
+#     # Use regex to filter out special characters and ANSI escape codes
+#     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def exec(cmd):
     if testing:
         print(' '.join(cmd))
     else:
-        run_command(' '.join(cmd))
+        subprocess.call(cmd, shell=False, stdout=sys.stdout,
+                stderr=sys.stderr, preexec_fn=preexec)
 
 
 def exec_chroot(cmd):
@@ -282,6 +259,7 @@ def inst_setup_base(config):
     exec_chroot(['pacman-key', '--populate', 'archlinux'])
     # Install linux-zen
     # exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux-zen', 'xorriso'])
+    exec_chroot(['pacman', '-Sy', '--noconfirm', 'neofetch']) # TESTING
     # Install linux
     exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'xorriso'])
     # Remove jade-gui and nimaos-inst
