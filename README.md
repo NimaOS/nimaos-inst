@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>blend-inst</h1>
+    <h1>nimaos-inst</h1>
 </div>
 
 <div align="center">
