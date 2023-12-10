@@ -16,7 +16,6 @@ import sys
 import json
 import signal
 import subprocess
-import pexpect
 import time
 import re
 
@@ -259,9 +258,14 @@ def inst_setup_base(config):
     exec_chroot(['pacman-key', '--populate', 'archlinux'])
     # Install linux-zen
     # exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux-zen', 'xorriso'])
-    exec_chroot(['pacman', '-Sy', '--noconfirm', 'neofetch']) # TESTING
+    exec_chroot(['pacman', '-Sy', '--noconfirm'])
     # Install linux
-    exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'xorriso'])
+    exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'linux-headers', 'linux-firmware', 'xorriso'])
+    
+    #     kernel_to_install,
+    #     format!("{kernel_to_install}-headers").as_str(),
+    #     "linux-firmware",
+
     # Remove jade-gui and nimaos-inst
     exec_chroot(['pacman', '-Rn', '--noconfirm', 'jade-gui', 'nimaos-inst-git'])
 
