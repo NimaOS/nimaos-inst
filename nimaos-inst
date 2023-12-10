@@ -261,7 +261,7 @@ def inst_setup_base(config):
     exec_chroot(['pacman', '-Sy', '--noconfirm'])
     # Install linux
     exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'linux-headers', 'linux-firmware', 'xorriso'])
-    
+
     #     kernel_to_install,
     #     format!("{kernel_to_install}-headers").as_str(),
     #     "linux-firmware",
@@ -279,11 +279,12 @@ def inst_bootloader(config):
         exec_chroot(['ln', '-s', '/dev/null',
                     '/etc/udev/rules.d/61-gdm.rules'])
     else:
-        exec_chroot(
-            ['bash', '-c', 'echo -e \'\\nGRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT} vt.global_cursor_default=0 splash"\' >> /etc/default/grub'])
+        pass
+        # exec_chroot(
+        #     ['bash', '-c', 'echo -e \'\\nGRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT} vt.global_cursor_default=0 splash"\' >> /etc/default/grub'])
     if config['partition']['mode'] == 'Auto':
         exec_chroot(
-            ['bash', '-c', 'echo -e \'\\nGRUB_TIMEOUT=0\' >> /etc/default/grub'])
+            ['bash', '-c', 'echo -e \'\\nGRUB_TIMEOUT=10\' >> /etc/default/grub'])
     if config['bootloader']['type'] == 'grub-efi':
         exec_chroot(['grub-install', '--target=x86_64-efi', f'--efi-directory={config["bootloader"]["location"]}',
                      '--bootloader-id=NimaOS', '--removable'])
