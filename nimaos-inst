@@ -364,7 +364,7 @@ def inst_users(config):
         #     sys.exit(3)
 
         exec_chroot(['useradd', '-m', '-s', '/bin/bash', user['name']])
-        # exec_chroot(['usermod', '-c', user['fullname'], user['name']]) # TODO: fix fullname
+        exec_chroot(['usermod', '-c', user['fullname'], user['name']])
         exec_chroot(
             ['bash', '-c', f'echo \'{user["name"]}:{user["password"]}\' | chpasswd'])
         exec_chroot(['usermod', '-aG', 'wheel', user['name']])

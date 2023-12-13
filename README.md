@@ -24,7 +24,7 @@ TESTING_INST=true ./nimaos-inst config 'sample-config.json'
 
 ### UI
 
-Jade-GUI, developed by Crystal Linux, can be used with nimaos-inst.
+Jade-GUI, developed by NimaOS, can be used with nimaos-inst.
 
 ### Error codes:
 
@@ -38,4 +38,4 @@ Anyone is free to contribute to nimaos-inst! It's licensed under the GPL-3.0 lic
 ## Credits
 
 nimaos-inst has been made by Nima Fanniasl.
-The base project, blend-inst has been written by Rudra Saraswat. However, the code is inspired by Jade (written in Rust), since it's meant to be a drop-in replacement for Jade. Jade is a project developed by **Crystal Linux**.
+The base project, blend-inst has been written by Rudra Saraswat. However, the code is inspired by Jade (written in Rust), since it's meant to be a drop-in replacement for Jade. Jade is a project developed by **NimaOS**.
