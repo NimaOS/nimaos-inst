@@ -35,17 +35,18 @@ def preexec():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGQUIT, signal.SIG_IGN)
 
-# def remove_special_chars(text):
-#     # Use regex to filter out special characters and ANSI escape codes
-#     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def exec(cmd):
     if testing:
         print(' '.join(cmd))
     else:
         subprocess.call(cmd, shell=False, stdout=sys.stdout,
-                stderr=sys.stderr, preexec_fn=preexec)
+                stderr=subprocess.STDOUT, preexec_fn=preexec)
 
+
+# def remove_special_chars(text):
+#     # Use regex to filter out special characters and ANSI escape codes
+#     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def exec_chroot(cmd):
     chroot_cmd = ['arch-chroot', '/mnt']
@@ -259,12 +260,9 @@ def inst_setup_base(config):
     # Install linux-zen
     # exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux-zen', 'xorriso'])
     exec_chroot(['pacman', '-Sy', '--noconfirm'])
-    # Install linux
-    exec_chroot(['pacman', '-Sy', '--noconfirm', 'linux', 'linux-headers', 'linux-firmware', 'xorriso'])
-
-    #     kernel_to_install,
-    #     format!("{kernel_to_install}-headers").as_str(),
-    #     "linux-firmware",
+    # Install the kernel
+    kernel = config["kernel"]
+    exec_chroot(['pacman', '-Sy', '--noconfirm', kernel, f'{kernel}-headers', 'xorriso'])
 
     # Remove jade-gui and nimaos-inst
     exec_chroot(['pacman', '-Rn', '--noconfirm', 'jade-gui', 'nimaos-inst-git'])
