@@ -36,37 +36,17 @@ def preexec():
     signal.signal(signal.SIGQUIT, signal.SIG_IGN)
 
 
-def clean_output(raw_output):
-    # Remove ANSI escape codes
-    clean_output = re.sub(r'\x1b\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', '', raw_output)
-
-    # Replace non-printable characters except newline
-    clean_output = ''.join(c if 32 <= ord(c) <= 126 or ord(c) == 10 else '' for c in clean_output)
-
-    # Remove specific sequences
-    clean_output = clean_output.replace('[?25h', '').replace('[?25l', '').replace('[1F', '')
-
-    return clean_output
-
 def exec(cmd):
-    cmd = "".join(cmd)
-    cmd = ["stdbuf", "-oL", "script", "-q", "-c", cmd]
+    if testing:
+        print(' '.join(cmd))
+    else:
+        subprocess.call(cmd, shell=False, stdout=sys.stdout,
+                stderr=subprocess.STDOUT, preexec_fn=preexec)
 
-    # Use subprocess.Popen to capture real-time output
-    process = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=preexec, text=True)
 
-    # Continuously read and process the output
-    while True:
-        line = process.stdout.readline()
-        if not line:
-            break
-
-        # Use clean_output function to remove special characters
-        clean_line = clean_output(line)
-        print(clean_line, end='', flush=True)
-
-    # Wait for the process to complete
-    process.wait()
+# def remove_special_chars(text):
+#     # Use regex to filter out special characters and ANSI escape codes
+#     return re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
 
 def exec_chroot(cmd):
     chroot_cmd = ['arch-chroot', '/mnt']
