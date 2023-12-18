@@ -24,16 +24,8 @@ if os.environ.get('TESTING_INST') == 'true':
 else:
     testing = False
 
-screen_session_name = "nimaos-inst-log"
-
 # State variables
 mountpoints = []
-
-# Open New Screen
-if not testing:
-    subprocess.Popen(["screen", "-S", screen_session_name])
-
-screen_run_command = ["screen", "-S", screen_session_name, "-X", "stuff"]
 
 ########################################################################################
 # Helper utils
@@ -48,12 +40,6 @@ def exec(cmd):
     if testing:
         print(' '.join(cmd))
     else:
-        cmd = "'" + ' '.join(cmd) + "'"
-        screen_cmd_copy = screen_run_command
-        screen_cmd_copy.append(cmd)
-        cmd = screen_cmd_copy
-        print(cmd)
-
         subprocess.call(cmd, shell=False, stdout=sys.stdout,
                 stderr=subprocess.STDOUT, preexec_fn=preexec)
 
